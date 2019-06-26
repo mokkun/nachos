@@ -1,6 +1,6 @@
 # Nachos for Android #
 
-[![Version](https://jitpack.io/v/mgbckr/nachos-v2.svg)](https://jitpack.io/#mgbckr/nachos-v2)
+[![Version](https://jitpack.io/v/mokkun/nachos.svg)](https://jitpack.io/#mokkun/nachos)
 ![Build Status](https://travis-ci.org/mokkun/nachos.svg?branch=master)
 
 ## Table of Contents ##
