@@ -40,6 +40,7 @@ import com.hootsuite.nachos.terminator.DefaultChipTerminatorHandler;
 import com.hootsuite.nachos.tokenizer.ChipTokenizer;
 import com.hootsuite.nachos.tokenizer.SpanChipTokenizer;
 import com.hootsuite.nachos.validator.ChipifyingNachoValidator;
+import com.hootsuite.nachos.validator.IllegalCharacterIdentifier;
 import com.hootsuite.nachos.validator.NachoValidator;
 
 import java.util.ArrayList;
@@ -61,14 +62,14 @@ import java.util.Map;
  *     To completely customize how chips are created when text is entered in this text view you can provide a custom {@link ChipTerminatorHandler}
  *     through {@link #setChipTerminatorHandler(ChipTerminatorHandler)}
  * <h1>Illegal Characters</h1>
- *     To prevent a character from being typed you can call {@link #setIllegalCharacters(char...)} and pass in all characters that should be considered
- *     illegal.
+ *     To prevent a character from being typed you can call {@link #setIllegalCharacterIdentifier(IllegalCharacterIdentifier)}} to identify characters
+ *     that should be considered illegal.
  * <h1>Suggestions</h1>
  *     To provide suggestions you must provide an {@link android.widget.Adapter} by calling {@link #setAdapter(ListAdapter)}
  * <h1>UI Customization</h1>
  *     This view defines six custom attributes (all of which are optional):
  *     <ul>
- *         <li>chipSpacing - the horizontal space between chips</li>
+ *         <li>chipHorizontalSpacing - the horizontal space between chips</li>
  *         <li>chipBackground - the background color of the chip</li>
  *         <li>chipCornerRadius - the corner radius of the chip background</li>
  *         <li>chipTextColor - the color of the chip text</li>
@@ -124,7 +125,7 @@ import java.util.Map;
 public class NachoTextView extends MultiAutoCompleteTextView implements TextWatcher, AdapterView.OnItemClickListener {
 
     // UI Attributes
-    private int mChipSpacing = -1;
+    private int mChipHorizontalSpacing = -1;
     private ColorStateList mChipBackground = null;
     private int mChipCornerRadius = -1;
     private int mChipTextColor = Color.TRANSPARENT;
@@ -155,7 +156,7 @@ public class NachoTextView extends MultiAutoCompleteTextView implements TextWatc
     @Nullable
     private NachoValidator mNachoValidator;
     @Nullable
-    private char[] mIllegalCharacters;
+    private IllegalCharacterIdentifier illegalCharacterIdentifier;
 
     @Nullable
     private OnChipRemoveListener mOnChipRemoveListener;
@@ -197,7 +198,7 @@ public class NachoTextView extends MultiAutoCompleteTextView implements TextWatc
                     R.style.DefaultChipSuggestionTextView);
 
             try {
-                mChipSpacing = attributes.getDimensionPixelSize(R.styleable.NachoTextView_chipSpacing, -1);
+                mChipHorizontalSpacing = attributes.getDimensionPixelSize(R.styleable.NachoTextView_chipHorizontalSpacing, -1);
                 mChipBackground = attributes.getColorStateList(R.styleable.NachoTextView_chipBackground);
                 mChipCornerRadius = attributes.getDimensionPixelSize(R.styleable.NachoTextView_chipCornerRadius, -1);
                 mChipTextColor = attributes.getColor(R.styleable.NachoTextView_chipTextColor, Color.TRANSPARENT);
@@ -290,12 +291,12 @@ public class NachoTextView extends MultiAutoCompleteTextView implements TextWatc
         updatePadding();
     }
 
-    public int getChipSpacing() {
-        return mChipSpacing;
+    public int getChipHorizontalSpacing() {
+        return mChipHorizontalSpacing;
     }
 
-    public void setChipSpacing(@DimenRes int chipSpacingResId) {
-        mChipSpacing = getContext().getResources().getDimensionPixelSize(chipSpacingResId);
+    public void setChipHorizontalSpacing(@DimenRes int chipHorizontalSpacingResId) {
+        mChipHorizontalSpacing = getContext().getResources().getDimensionPixelSize(chipHorizontalSpacingResId);
         invalidateChips();
     }
 
@@ -445,13 +446,15 @@ public class NachoTextView extends MultiAutoCompleteTextView implements TextWatc
     }
 
     /**
-     * Sets the characters that will not show up in the field when typed (i.e. they will be deleted as soon as they are entered).
-     * If a character is listed as both a chip terminator character and an illegal character, it will be treated as an illegal character.
+     * Sets the {@link IllegalCharacterIdentifier} that will identify characters that should
+     * not show up in the field when typed (i.e. they will be deleted as soon as they are entered).
+     * If a character is listed as both a chip terminator character and an illegal character,
+     * it will be treated as an illegal character.
      *
-     * @param illegalCharacters the characters to be deemed illegal
+     * @param illegalCharacterIdentifier the identifier to use
      */
-    public void setIllegalCharacters(@Nullable char... illegalCharacters) {
-        mIllegalCharacters = illegalCharacters;
+    public void setIllegalCharacterIdentifier(@Nullable IllegalCharacterIdentifier illegalCharacterIdentifier) {
+        this.illegalCharacterIdentifier = illegalCharacterIdentifier;
     }
 
     /**
@@ -466,7 +469,7 @@ public class NachoTextView extends MultiAutoCompleteTextView implements TextWatc
             Editable text = getText();
             int availableWidth = getWidth() - getCompoundPaddingLeft() - getCompoundPaddingRight();
             ChipConfiguration configuration = new ChipConfiguration(
-                    mChipSpacing,
+                    mChipHorizontalSpacing,
                     mChipBackground,
                     mChipCornerRadius,
                     mChipTextColor,
@@ -783,6 +786,14 @@ public class NachoTextView extends MultiAutoCompleteTextView implements TextWatc
         int end = getSelectionEnd();
         Editable editable = getText();
         int start = mChipTokenizer.findTokenStart(editable, end);
+
+        // guard against java.lang.StringIndexOutOfBoundsException
+        start = Math.min(Math.max(0, start), editable.length());
+        end = Math.min(Math.max(0, end), editable.length());
+        if (end < start) {
+            end = start;
+        }
+
         editable.replace(start, end, mChipTokenizer.terminateToken(text, data));
 
         endUnwatchedTextChange();
@@ -925,12 +936,8 @@ public class NachoTextView extends MultiAutoCompleteTextView implements TextWatc
     }
 
     private boolean isIllegalCharacter(char character) {
-        if (mIllegalCharacters != null) {
-            for (char c : mIllegalCharacters) {
-                if (c == character) {
-                    return true;
-                }
-            }
+        if (illegalCharacterIdentifier != null) {
+            return illegalCharacterIdentifier.isCharacterIllegal(character);
         }
         return false;
     }
