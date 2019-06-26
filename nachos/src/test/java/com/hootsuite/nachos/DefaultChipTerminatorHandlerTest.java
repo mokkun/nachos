@@ -3,6 +3,8 @@ package com.hootsuite.nachos;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.hootsuite.nachos.terminator.ChipTerminatorHandler;
 import com.hootsuite.nachos.terminator.DefaultChipTerminatorHandler;
 import com.hootsuite.nachos.tokenizer.ChipTokenizer;
@@ -14,27 +16,25 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
+import org.mockito.hamcrest.MockitoHamcrest;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.robolectric.annotation.Config;
 
 import static com.hootsuite.nachos.matchers.CharSequenceMatchers.toStringEq;
 import static com.hootsuite.nachos.matchers.IntegerMatchers.between;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.intThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.intThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(CustomRobolectricRunner.class)
-@Config(constants = BuildConfig.class)
+@RunWith(AndroidJUnit4.class)
 public class DefaultChipTerminatorHandlerTest extends TestCase {
 
     private static final char CHIPIFY_ALL_CHAR = '\n';
@@ -57,7 +57,7 @@ public class DefaultChipTerminatorHandlerTest extends TestCase {
 
     @Before
     public void setup() {
-        mChipTokenizer = Mockito.mock(ChipTokenizer.class);
+        mChipTokenizer = mock(ChipTokenizer.class);
         mDefaultChipTerminatorHandler = new DefaultChipTerminatorHandler();
     }
 
@@ -245,8 +245,9 @@ public class DefaultChipTerminatorHandlerTest extends TestCase {
         int firstTokenStart = 0;
         int firstTokenEnd = SINGLE_TOKEN.length();
 
-        when(chipTokenizer.findTokenStart(any(CharSequence.class), intThat(Matchers.lessThanOrEqualTo(firstTokenEnd)))).thenReturn(firstTokenStart);
-        when(chipTokenizer.findTokenEnd(any(CharSequence.class), intThat(Matchers.lessThanOrEqualTo(firstTokenEnd)))).thenReturn(firstTokenEnd);
+
+        when(chipTokenizer.findTokenStart(any(CharSequence.class), MockitoHamcrest.intThat(Matchers.lessThanOrEqualTo(firstTokenEnd)))).thenReturn(firstTokenStart);
+        when(chipTokenizer.findTokenEnd(any(CharSequence.class), MockitoHamcrest.intThat(Matchers.lessThanOrEqualTo(firstTokenEnd)))).thenReturn(firstTokenEnd);
         when(chipTokenizer.terminateToken(argThat(toStringEq(SINGLE_TOKEN)), any())).thenReturn(SINGLE_TOKEN_CHIPIFIED);
 
         // run
@@ -332,10 +333,10 @@ public class DefaultChipTerminatorHandlerTest extends TestCase {
         int token3End = token3Start + SINGLE_TOKEN_3.length();
         int afterToken3 = token3Start + SINGLE_TOKEN_3_CHIPIFIED.length();
 
-        when(chipTokenizer.findTokenStart(any(CharSequence.class), intThat(Matchers.lessThanOrEqualTo(token1End)))).thenReturn(token1Start);
+        when(chipTokenizer.findTokenStart(any(CharSequence.class), MockitoHamcrest.intThat(Matchers.lessThanOrEqualTo(token1End)))).thenReturn(token1Start);
         when(chipTokenizer.findTokenStart(any(CharSequence.class), intThat(between(token2Start, token2End)))).thenReturn(token2Start);
         when(chipTokenizer.findTokenStart(any(CharSequence.class), intThat(between(token3Start, token3End)))).thenReturn(token3Start);
-        when(chipTokenizer.findTokenStart(any(CharSequence.class), intThat(Matchers.greaterThanOrEqualTo(afterToken3)))).thenReturn(afterToken3);
+        when(chipTokenizer.findTokenStart(any(CharSequence.class), MockitoHamcrest.intThat(Matchers.greaterThanOrEqualTo(afterToken3)))).thenReturn(afterToken3);
         doAnswer(new Answer<CharSequence>() {
 
             @Override

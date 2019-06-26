@@ -7,6 +7,8 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.Pair;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import com.hootsuite.nachos.chip.Chip;
 import com.hootsuite.nachos.chip.ChipCreator;
 import com.hootsuite.nachos.tokenizer.SpanChipTokenizer;
@@ -19,7 +21,6 @@ import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
 
 import java.util.List;
 
@@ -32,8 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(CustomRobolectricRunner.class)
-@Config(constants = BuildConfig.class)
+@RunWith(AndroidJUnit4.class)
 public class SpanChipTokenizerTest extends TestCase {
 
     private static final CharSequence EMPTY_STRING = "";
