@@ -28,6 +28,8 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
+    testOptions.unitTests.includeAndroidResources = true
+
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -45,11 +47,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:support-compat:$rootProject.ext.supportLibVersion"
-    testImplementation 'org.robolectric:robolectric:4.0.2'
-    testImplementation 'org.mockito:mockito-core:2.21.0'
-    testImplementation('com.squareup.assertj:assertj-android:1.1.0') {
-        exclude group: 'org.mockito', module: 'mockito-core'
-    }
+    testImplementation 'androidx.test.ext:junit:1.1.1'
+    testImplementation 'org.robolectric:robolectric:4.3'
+    testImplementation 'org.mockito:mockito-core:2.28.2'
+    testImplementation('com.squareup.assertj:assertj-android:1.2.0')
 }
 
 apply from: 'maven_push.gradle'
