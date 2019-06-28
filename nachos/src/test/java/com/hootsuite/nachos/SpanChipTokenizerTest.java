@@ -7,6 +7,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.Pair;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.hootsuite.nachos.chip.Chip;
@@ -20,7 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.robolectric.RuntimeEnvironment;
 
 import java.util.List;
 
@@ -80,7 +80,8 @@ public class SpanChipTokenizerTest extends TestCase {
             }
         }).when(mMockChipCreator).createChip(any(Context.class), any(Chip.class));
 
-        mSpanChipTokenizer = new SpanChipTokenizer<>(RuntimeEnvironment.application.getApplicationContext(), mMockChipCreator, Chip.class);
+        Context context = ApplicationProvider.getApplicationContext();
+        mSpanChipTokenizer = new SpanChipTokenizer<>(context, mMockChipCreator, Chip.class);
         singleTokenChipified = createChipText(SINGLE_TOKEN);
     }
 

@@ -2,6 +2,7 @@ package com.hootsuite.nachos;
 
 import android.content.Context;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.hootsuite.nachos.chip.ChipSpan;
@@ -12,7 +13,6 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RuntimeEnvironment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +26,7 @@ public class ChipSpanChipCreatorTest extends TestCase {
 
     @Before
     public void setup() {
-        mContext = RuntimeEnvironment.application.getApplicationContext();
+        mContext = ApplicationProvider.getApplicationContext();
         mChipSpanChipCreator = new ChipSpanChipCreator();
     }
 
